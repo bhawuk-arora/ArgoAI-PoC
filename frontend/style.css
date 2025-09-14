@@ -1,0 +1,4 @@
+body { font-family: Arial; margin: 20px; }
+input { width: 300px; padding: 5px; }
+button { margin: 5px; padding: 6px; cursor: pointer; }
+pre { background: #f4f4f4; padding: 10px; border-radius: 5px; }
