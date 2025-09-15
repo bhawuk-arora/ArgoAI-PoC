@@ -1,14 +1,20 @@
+import os
 import pandas as pd
 from sentence_transformers import SentenceTransformer
 import faiss
 import numpy as np
-import pickle
+
+# Ensure data directory exists
+os.makedirs("./data", exist_ok=True)
 
 # Load CSV
-df = pd.read_csv("../data/argo_profiles.csv")
+df = pd.read_csv("./data/argo_profiles.csv")
 
-# Create a text summary for each row
-df['summary'] = df.apply(lambda row: f"Salinity {row['salinity']} at depth {row['depth']} and temperature {row['temperature']}", axis=1)
+# Use correct column names from ETL (they are lowercase)
+df['summary'] = df.apply(
+    lambda row: f"Salinity {row['psal']} at depth {row['pres']} and temperature {row['temp']}",
+    axis=1
+)
 
 # Create embeddings
 model = SentenceTransformer('all-MiniLM-L6-v2')

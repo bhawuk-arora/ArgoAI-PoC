@@ -4,8 +4,8 @@ from sentence_transformers import SentenceTransformer
 import numpy as np
 
 # Load index and data
-index = faiss.read_index("../data/faiss_index.idx")
-df = pd.read_pickle("../data/argo_profiles.pkl")
+index = faiss.read_index("./data/faiss_index.idx")
+df = pd.read_pickle("./data/argo_profiles.pkl")
 
 # Model
 model = SentenceTransformer('all-MiniLM-L6-v2')
