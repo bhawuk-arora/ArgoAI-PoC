@@ -17,4 +17,4 @@ def run_etl(nc_file: str, out_csv: str):
     return out_csv
 
 if __name__ == "__main__":
-    run_etl("data/sample_netcdf_data.nc", "data/argo_profiles.csv")
+    run_etl("../data/sample_netcdf_data.nc", "../data/argo_profiles.csv")
