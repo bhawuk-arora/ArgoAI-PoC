@@ -2,11 +2,10 @@ import pandas as pd
 import re
 from typing import Dict, Any, List
 
-# For prototype simplicity, we load the CSV directly to simulate query execution
+# Load the CSV data once when the script starts
 try:
-    # Load the data, assuming the file path is correct
+    # This loads your local data for simulation
     df_data = pd.read_csv("../data/argo_profiles.csv")
-    # Add a dummy date column for the NL-to-SQL output to be realistic
     df_data['date'] = '2021-07-14'
 except FileNotFoundError:
     print("Warning: argo_profiles.csv not found. Using mock data for SynapseQuery.")
@@ -21,35 +20,42 @@ class SynapseQuery:
     """Mock class to simulate a Synapse query runner using a local Pandas DataFrame."""
     def __init__(self, *args, **kwargs):
         # Mocking connection setup
-        pass
+        pass # No actual connection needed for the POC
 
     def run_query(self, sql: str) -> List[Dict[str, Any]]:
-        """Executes a simple mocked query (currently only supports MAX on a column)."""
-        match = re.search(r"MAX\((\w+)\)", sql, re.IGNORECASE)
+        """Executes a simple mocked aggregation query (MAX or AVG)."""
+        match_max = re.search(r"MAX\((\w+)\)", sql, re.IGNORECASE)
+        match_avg = re.search(r"AVG\((\w+)\)", sql, re.IGNORECASE)
         
-        if match:
-            col = match.group(1).lower()
+        if match_max:
+            col = match_max.group(1).lower()
             if col in df_data.columns:
-                # Mock a result for an aggregation query
                 max_val = df_data[col].max()
-                return [{"max_value": max_val, "parameter": col}]
+                return [{"value": round(max_val, 3), "parameter": col, "aggregation": "MAX"}]
         
-        # Fallback for simple SELECT queries (if routing fails)
-        cols = ['pres', 'temp', 'psal', 'date']
+        if match_avg:
+            col = match_avg.group(1).lower()
+            if col in df_data.columns:
+                avg_val = df_data[col].mean()
+                return [{"value": round(avg_val, 3), "parameter": col, "aggregation": "AVG"}]
+        
+        # Fallback for general SELECT
+        cols = ['pres', 'temp', 'psal']
         return df_data[cols].head(5).to_dict(orient="records")
 
 
-# Enhanced NL→SQL mapping (prototype only) to produce a "SQL" query
+# Enhanced NL→SQL mapping for the router
 def nl_to_sql(query: str) -> Dict[str, str]:
     q_lower = query.lower()
     
-    # Complex/Quantitative Queries (to show LLM intelligence)
     if "max temperature" in q_lower or "highest temperature" in q_lower:
         return {"sql": "SELECT MAX(temp) FROM argo_profiles WHERE pres < 100;", "type": "max_temp"}
     
-    if "average salinity" in q_lower or "mean salinity" in q_lower:
-        # Note: run_query is simplified, but this SQL shows the correct intention
-        return {"sql": "SELECT AVG(psal) FROM argo_profiles WHERE pres BETWEEN 100 AND 300;", "type": "avg_salinity"}
+    if "average salinity" in q_lower or "mean salinity" in q_lower or "avg salinity" in q_lower:
+        return {"sql": "SELECT AVG(psal) FROM argo_profiles WHERE pres BETWEEN 10 AND 300;", "type": "avg_salinity"}
     
-    # Default simple selection query
+    if "max salinity" in q_lower or "highest salinity" in q_lower:
+        return {"sql": "SELECT MAX(psal) FROM argo_profiles;", "type": "max_salinity"}
+    
+    # Default selection query
     return {"sql": "SELECT TOP 5 * FROM argo_profiles;", "type": "select_all"}
