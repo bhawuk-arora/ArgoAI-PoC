@@ -1,15 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Argo Conversational Explorer</title>
-  <script src="app.js"></script>
+  <title>Argo AI: Conversational Ocean Data Explorer</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <script src="app.js"></script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h2>🌊 Argo Conversational Explorer</h2>
-  <input type="text" id="query" placeholder="Ask about temperature, salinity..."/>
-  <button onclick="semantic()">Semantic Search</button>
-  <button onclick="sql()">SQL Query</button>
-  <pre id="output"></pre>
+  <h2>🌊 Argo AI: Conversational Ocean Data Explorer</h2>
+  
+  <input type="text" id="query" placeholder="Ask about 'salinity near surface' or 'max temperature'"/>
+  <button onclick="query()">Intelligent Query (AI)</button>
+  
+  <hr/>
+  
+  <div id="output-header"></div>
+  <canvas id="chartCanvas" width="400" height="200"></canvas>
+  
+  <h4>Raw API Output:</h4>
+  <pre id="rawOutput"></pre>
 </body>
 </html>
