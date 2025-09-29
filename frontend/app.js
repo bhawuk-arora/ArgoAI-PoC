@@ -5,28 +5,26 @@ async function query() {
   let q = document.getElementById("query").value;
   const header = document.getElementById("output-header");
   const rawOutput = document.getElementById("rawOutput");
+  const canvas = document.getElementById('chartCanvas');
   
   header.innerHTML = "Querying...";
   rawOutput.innerText = "";
+  if (myChart) {
+    myChart.destroy(); // Clear previous chart
+  }
   
   try {
     // 1. Fetch data from the new intelligent endpoint
+    // Make sure your backend is running on port 8000
     let res = await fetch(`http://127.0.0.1:8000/query?q=${q}`);
     let data = await res.json();
     
     // Display raw data 
     rawOutput.innerText = JSON.stringify(data, null, 2);
 
-    // Clear previous chart
-    const canvas = document.getElementById('chartCanvas');
-    if (myChart) {
-      myChart.destroy();
-    }
-    
-    // --- Visualization Logic based on AI Routing Mode ---
-    
+    // 2. Visualization Logic based on AI Routing Mode
     if (data.mode === "SEMANTIC_SEARCH") {
-      header.innerHTML = `✅ **Mode: Semantic Search (RAG)** - Found 5 relevant profiles for context.`;
+      header.innerHTML = `✅ **Mode: Semantic Search (RAG)** - Found relevant profiles for context.`;
       
       // Plot the first profile (Pressure vs. Temperature)
       const labels = data.results.map(r => r.pres);
@@ -40,13 +38,14 @@ async function query() {
             label: `Temperature (°C) for best match (Pressure: dbar)`,
             data: temp_data,
             borderColor: 'rgb(75, 192, 192)',
-            tension: 0.1
+            tension: 0.1,
+            fill: false
           }]
         },
         options: {
           scales: {
             x: { title: { display: true, text: 'Pressure (dbar)' } },
-            y: { title: { display: true, text: 'Temperature (°C)' }, reverse: true } // Reverse Y-axis for depth
+            y: { title: { display: true, text: 'Temperature (°C)' }, reverse: true } // Reverse Y-axis for depth visualization
           }
         }
       });
@@ -54,26 +53,28 @@ async function query() {
     } else if (data.mode === "NL_TO_SQL") {
       header.innerHTML = `✅ **Mode: NL-to-SQL Translation** - Executed SQL: <pre>${data.sql}</pre>`;
 
-      // Plot the quantitative result (assuming it's MAX temp/salinity for simplicity)
+      // Plot the quantitative result
       if (data.results && data.results.length > 0) {
         const result = data.results[0];
-        // Find the result value and parameter name
-        const valueKey = Object.keys(result).filter(k => k.endsWith('_value'))[0];
+        const valueKey = Object.keys(result).find(k => k === 'value');
         const parameter = result.parameter.toUpperCase();
         const value = result[valueKey];
+        const aggregation = result.aggregation;
         
         myChart = new Chart(canvas.getContext('2d'), {
           type: 'bar',
           data: {
-            labels: [parameter],
+            labels: [`${aggregation} ${parameter}`],
             datasets: [{
-              label: valueKey.replace('_', ' ').toUpperCase(),
+              label: `${aggregation} Result`,
               data: [value],
               backgroundColor: 'rgba(255, 99, 132, 0.5)'
             }]
           },
           options: {
-             scales: { y: { beginAtZero: true } }
+             scales: { 
+                 y: { beginAtZero: false, title: { display: true, text: parameter } } 
+             }
           }
         });
       }
@@ -83,12 +84,10 @@ async function query() {
     }
     
   } catch (error) {
-    header.innerText = "Error fetching data from API. Is FastAPI running (Run `uvicorn main:app --reload` in your backend directory)? Check console for details.";
+    header.innerHTML = "❌ **Error fetching data from API.** Is FastAPI running? Check console for details.";
     rawOutput.innerText = `Fetch Error: ${error}`;
     console.error("API Fetch Error:", error);
   }
 }
 
-// Keeping legacy functions as placeholders but they are unused by the new HTML
-async function semantic() { /* ... */ }
-async function sql() { /* ... */ }
+// Removed original semantic() and sql() functions as they are no longer used by index.html

@@ -2,9 +2,8 @@ import pandas as pd
 import re
 from typing import Dict, Any, List
 
-# Load the CSV data once when the script starts
+# Load the CSV data once when the script starts for fast local execution simulation
 try:
-    # This loads your local data for simulation
     df_data = pd.read_csv("../data/argo_profiles.csv")
     df_data['date'] = '2021-07-14'
 except FileNotFoundError:
@@ -19,8 +18,7 @@ except FileNotFoundError:
 class SynapseQuery:
     """Mock class to simulate a Synapse query runner using a local Pandas DataFrame."""
     def __init__(self, *args, **kwargs):
-        # Mocking connection setup
-        pass # No actual connection needed for the POC
+        pass # Mocking connection
 
     def run_query(self, sql: str) -> List[Dict[str, Any]]:
         """Executes a simple mocked aggregation query (MAX or AVG)."""
@@ -44,7 +42,7 @@ class SynapseQuery:
         return df_data[cols].head(5).to_dict(orient="records")
 
 
-# Enhanced NL→SQL mapping for the router
+# Enhanced NL→SQL mapping for the router (simulates LLM translation)
 def nl_to_sql(query: str) -> Dict[str, str]:
     q_lower = query.lower()
     
@@ -57,5 +55,4 @@ def nl_to_sql(query: str) -> Dict[str, str]:
     if "max salinity" in q_lower or "highest salinity" in q_lower:
         return {"sql": "SELECT MAX(psal) FROM argo_profiles;", "type": "max_salinity"}
     
-    # Default selection query
     return {"sql": "SELECT TOP 5 * FROM argo_profiles;", "type": "select_all"}
