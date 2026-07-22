@@ -1,5 +1,4 @@
 from fastapi import FastAPI, Query
-from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware # <--- NEW IMPORT
 from semantic_search import SemanticSearch
 from synapse_query import SynapseQuery, nl_to_sql
@@ -57,6 +56,3 @@ def intelligent_query(q: str = Query(...)) -> Dict[str, Any]:
             "mode": "SEMANTIC_SEARCH", 
             "results": results
         }
-
-# Mount static files for the frontend
-app.mount("/", StaticFiles(directory="../frontend", html=True), name="frontend")

@@ -16,7 +16,7 @@ async function query() {
   try {
     // 1. Fetch data from the new intelligent endpoint
     // Make sure your backend is running on port 8000
-    let res = await fetch(`http://127.0.0.1:8000/query?q=${q}`);
+    let res = await fetch(`/query?q=${q}`);
     let data = await res.json();
     
     // Display raw data 

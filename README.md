@@ -32,29 +32,21 @@ This prototype is built upon a foundation designed for petabyte-scale, real-time
 
 ---
 
-### 🐳 Docker Orchestration & Architecture
+### 🐳 Microservices Architecture (Docker Compose)
 
-To simplify deployment and running the application, the entire stack has been containerized using Docker. 
+The application has been refactored into a true microservices architecture, orchestrating multiple containers via `docker-compose`.
 
 #### What was exactly done:
-1. **Unified Serving**: Modified the FastAPI backend (`backend/main.py`) to mount and serve the static `frontend` directory using `StaticFiles`. This allows a single web server (`uvicorn`) to serve both the API endpoints and the user interface.
-2. **Dependencies Updated**: Added `fastapi` and `uvicorn` to `requirements.txt` as they were missing but required for the server to run.
-3. **Containerization**: Created a single `Dockerfile` that uses `python:3.10-slim`. It copies the `backend`, `frontend`, and `data` directories, installs dependencies, and runs the application via `uvicorn` on port 8000.
-4. **Ignored Files**: Created `.dockerignore` to keep the image lightweight by excluding `__pycache__` and other unnecessary files.
+1. **Frontend Service (Nginx)**: The frontend is now served by a dedicated lightweight Nginx container (`frontend/Dockerfile`). We also added a custom `nginx.conf` that reverse-proxies API calls (like `/query`) directly to the backend. This eliminates CORS issues and allows the frontend JavaScript to cleanly use relative paths.
+2. **Backend Service (FastAPI)**: The backend runs in its own isolated Python container (`backend/Dockerfile`). It is strictly responsible for serving the API on port 8000 and no longer serves static frontend files.
+3. **Orchestration (`docker-compose.yml`)**: A root docker-compose file ties the two services together, allowing them to communicate over a private Docker network.
 
-#### How to Run via Docker:
+#### How to Run:
 
-1. **Build the Docker Image**:
-   From the root of the repository, run:
-   ```bash
-   docker build -t argoai-poc .
-   ```
+Simply run the following command from the root of the repository:
+```bash
+docker-compose up -d --build
+```
 
-2. **Run the Docker Container**:
-   Start the container and map port 8000:
-   ```bash
-   docker run -p 8000:8000 argoai-poc
-   ```
-
-3. **Access the Application**:
-   Open your browser and navigate to: [http://localhost:8000/](http://localhost:8000/)
+**Access the Application**:
+Open your browser and navigate to: [http://localhost/](http://localhost/) (Port 80)
