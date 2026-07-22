@@ -1,23 +1,52 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>🌊 Argo AI: Conversational Ocean Data Explorer</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
-  <script src="app.js"></script>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Argo AI: Conversational Ocean Data Explorer</title>
+    <!-- Modern Typography: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
+    <!-- Custom CSS & JS -->
+    <link rel="stylesheet" href="style.css">
+    <script src="app.js" defer></script>
 </head>
 <body>
-  <h2>🌊 Argo AI: Conversational Ocean Data Explorer</h2>
-  
-  <input type="text" id="query" placeholder="Ask about 'salinity near surface' or 'max temperature'"/>
-  <button onclick="query()">Intelligent Query (AI)</button>
-  
-  <hr/>
-  
-  <div id="output-header"></div>
-  <canvas id="chartCanvas" width="400" height="200"></canvas>
-  
-  <h4>Raw API Output:</h4>
-  <pre id="rawOutput"></pre>
+    <div class="background-gradient"></div>
+
+    <main class="dashboard-container">
+        <header class="app-header">
+            <div class="logo">🌊</div>
+            <h1>Argo AI</h1>
+            <p>Conversational Ocean Data Explorer</p>
+        </header>
+
+        <section class="query-section glass-panel">
+            <div class="search-bar">
+                <input type="text" id="query" placeholder="Ask about 'salinity near surface' or 'max temperature'..." autocomplete="off"/>
+                <button onclick="query()" id="query-btn">
+                    <span class="btn-text">Explore</span>
+                    <div class="loader" id="btn-loader" style="display: none;"></div>
+                </button>
+            </div>
+            <div id="output-header" class="status-message">Ready for your query.</div>
+        </section>
+
+        <section class="results-section glass-panel">
+            <div class="chart-container">
+                <canvas id="chartCanvas"></canvas>
+            </div>
+        </section>
+
+        <section class="raw-data-section glass-panel">
+            <div class="section-header">
+                <h3>Raw API Output</h3>
+            </div>
+            <pre id="rawOutput" class="code-block"></pre>
+        </section>
+    </main>
 </body>
 </html>
