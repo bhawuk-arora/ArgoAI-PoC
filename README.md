@@ -30,3 +30,31 @@ This prototype is built upon a foundation designed for petabyte-scale, real-time
     * **Vector Database (FAISS/Pinecone):** Stores vector embeddings for contextual search (used by Semantic Search).
 4.  **FastAPI Agent:** The intelligent orchestration layer that determines the user's intent and executes the correct query tool.
 
+---
+
+### 🐳 Docker Orchestration & Architecture
+
+To simplify deployment and running the application, the entire stack has been containerized using Docker. 
+
+#### What was exactly done:
+1. **Unified Serving**: Modified the FastAPI backend (`backend/main.py`) to mount and serve the static `frontend` directory using `StaticFiles`. This allows a single web server (`uvicorn`) to serve both the API endpoints and the user interface.
+2. **Dependencies Updated**: Added `fastapi` and `uvicorn` to `requirements.txt` as they were missing but required for the server to run.
+3. **Containerization**: Created a single `Dockerfile` that uses `python:3.10-slim`. It copies the `backend`, `frontend`, and `data` directories, installs dependencies, and runs the application via `uvicorn` on port 8000.
+4. **Ignored Files**: Created `.dockerignore` to keep the image lightweight by excluding `__pycache__` and other unnecessary files.
+
+#### How to Run via Docker:
+
+1. **Build the Docker Image**:
+   From the root of the repository, run:
+   ```bash
+   docker build -t argoai-poc .
+   ```
+
+2. **Run the Docker Container**:
+   Start the container and map port 8000:
+   ```bash
+   docker run -p 8000:8000 argoai-poc
+   ```
+
+3. **Access the Application**:
+   Open your browser and navigate to: [http://localhost:8000/](http://localhost:8000/)
